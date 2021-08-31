@@ -20,6 +20,7 @@ package edu.ncsu.csc326.coffeemaker;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -29,7 +30,7 @@ import edu.ncsu.csc326.coffeemaker.exceptions.RecipeException;
 /**
  * Unit tests for CoffeeMaker class.
  * 
- * @author Sarah Heckman
+ * @author Pittayut Benjamasutin
  */
 public class CoffeeMakerTest {
 	
@@ -105,31 +106,250 @@ public class CoffeeMakerTest {
 	public void testAddInventory() throws InventoryException {
 		coffeeMaker.addInventory("4","7","0","9");
 	}
-	
+
+	/**
+	 * Given two well-formed recipes
+	 * When we added two recipes to program
+	 * Then we should get True from program return.
+	 */
+	@Test
+	public void testAddRecipe() {
+		Assert.assertTrue(this.coffeeMaker.addRecipe(this.recipe2));
+		Assert.assertTrue(this.coffeeMaker.addRecipe(this.recipe3));
+	}
+
+	/**
+	 * Given four well-formed recipes
+	 * When we added four recipes into program
+	 * Then program should add only 3 recipes and
+	 * the fourth recipe will return false
+	 */
+	@Test
+	public void testAddMoreThanThreeRecipes() {
+		this.coffeeMaker.addRecipe(this.recipe1);
+		this.coffeeMaker.addRecipe(this.recipe2);
+		this.coffeeMaker.addRecipe(this.recipe3);
+		Assert.assertFalse(this.coffeeMaker.addRecipe(this.recipe4));
+	}
+
+	/**
+	 * Given one well-formed recipe
+	 * When we added a duplicated recipe into recipes book
+	 * Then we should get return false.
+	 */
+	@Test
+	public void testAddRecipeWithDuplicateName() {
+		Assert.assertTrue(this.coffeeMaker.addRecipe(this.recipe1));
+		Assert.assertFalse(this.coffeeMaker.addRecipe(this.recipe1));
+	}
+
+	/**
+	 * Given program added well-formed recipe
+	 * When we try to delete a recipe
+	 * Then we should get return name of deleted recipe name and
+	 * can't find the deleted recipe in the recipes list.
+	 */
+	@Test
+	public void testDeleteRecipe() {
+		this.coffeeMaker.addRecipe(this.recipe3);
+		Assert.assertEquals(this.recipe3.getName(), this.coffeeMaker.deleteRecipe(0));
+		Assert.assertNotEquals(this.recipe3, this.coffeeMaker.getRecipes()[0]);
+	}
+
+	/**
+	 * Given program hasn't any recipes
+	 * When we try to delete a recipe
+	 * Then we should get return Null.
+	 */
+	@Test
+	public void testDeleteRecipeNotExist() {
+		Assert.assertNull(this.coffeeMaker.deleteRecipe(0));
+	}
+
+	/**
+	 * Given program added a well-formed recipe
+	 * When we try to edit a recipe
+	 * Then we should get name of the edited recipe.
+	 */
+	@Test
+	public void testEditValidRecipe() {
+		this.coffeeMaker.addRecipe(this.recipe1);
+		Assert.assertEquals(this.recipe1.getName(), this.coffeeMaker.editRecipe(0, this.recipe3));
+	}
+
+	/**
+	 * Given the program hasn't any recipes
+	 * When we try to edit a recipe
+	 * Then we should get return Null.
+	 */
+	@Test
+	public void testEditNotExistRecipe() {
+		Assert.assertNull(this.coffeeMaker.editRecipe(0, this.recipe3));
+	}
+
 	/**
 	 * Given a coffee maker with the default inventory
-	 * When we add inventory with malformed quantities (i.e., a negative 
+	 * When we add inventory with well-formed quantities (i.e., a negative
 	 * quantity and a non-numeric string)
 	 * Then we get an inventory exception
-	 * 
+	 *
+	 * @throws InventoryException  if there was an error parsing the quanity
+	 * 		to a positive integer.
+	 */
+	@Test
+	public void testAddInventoryWithValid() throws InventoryException {
+		this.coffeeMaker.addInventory("4", "7", "1", "9");
+		this.coffeeMaker.addInventory("2", "3", "4", "5");
+	}
+
+	/**
+	 * Given a coffee maker with the default inventory
+	 * When we add inventory with malformed quantities (i.e., a negative
+	 * quantity and a non-numeric string)
+	 * Then we get an inventory exception
+	 *
 	 * @throws InventoryException  if there was an error parsing the quanity
 	 * 		to a positive integer.
 	 */
 	@Test(expected = InventoryException.class)
 	public void testAddInventoryException() throws InventoryException {
-		coffeeMaker.addInventory("4", "-1", "asdf", "3");
+		this.coffeeMaker.addInventory("4", "-1", "asdf", "3");
 	}
-	
+
 	/**
-	 * Given a coffee maker with one valid recipe
-	 * When we make coffee, selecting the valid recipe and paying more than 
+	 * Given a coffee maker with the default inventory
+	 * When we add inventory with malformed coffee quantities (i.e., a negative
+	 * quantity and a non-numeric string)
+	 * Then we get an inventory exception
+	 *
+	 * @throws InventoryException  if there was an error parsing the quanity
+	 * 		to a positive integer.
+	 */
+	@Test(expected = InventoryException.class)
+	public void testAddInventoryInvalidCoffee() throws InventoryException {
+		this.coffeeMaker.addInventory("abc", "2", "4", "6");
+		this.coffeeMaker.addInventory("-2", "2", "4", "6");
+		this.coffeeMaker.addInventory("0", "2", "4", "6");
+	}
+
+	/**
+	 * Given a coffee maker with the default inventory
+	 * When we add inventory with malformed milk quantities (i.e., a negative
+	 * quantity and a non-numeric string)
+	 * Then we get an inventory exception
+	 *
+	 * @throws InventoryException  if there was an error parsing the quanity
+	 * 		to a positive integer.
+	 */
+	@Test(expected = InventoryException.class)
+	public void testAddInventoryInvalidMilk() throws InventoryException {
+		this.coffeeMaker.addInventory("1", "abc", "4", "6");
+		this.coffeeMaker.addInventory("1", "-2", "4", "6");
+		this.coffeeMaker.addInventory("1", "0", "4", "6");
+	}
+
+	/**
+	 * Given a coffee maker with the default inventory
+	 * When we add inventory with malformed sugar quantities (i.e., a negative
+	 * quantity and a non-numeric string)
+	 * Then we get an inventory exception
+	 *
+	 * @throws InventoryException  if there was an error parsing the quanity
+	 * 		to a positive integer.
+	 */
+	@Test(expected = InventoryException.class)
+	public void testAddInventoryInvalidSugar() throws InventoryException {
+		this.coffeeMaker.addInventory("1", "2", "abc", "6");
+		this.coffeeMaker.addInventory("1", "2", "-1", "6");
+		this.coffeeMaker.addInventory("1", "2", "0", "6");
+	}
+
+	/**
+	 * Given a coffee maker with the default inventory
+	 * When we add inventory with malformed chocolate quantities (i.e., a negative
+	 * quantity and a non-numeric string)
+	 * Then we get an inventory exception
+	 *
+	 * @throws InventoryException  if there was an error parsing the quanity
+	 * 		to a positive integer.
+	 */
+	@Test(expected = InventoryException.class)
+	public void testAddInventoryInvalidChocolate() throws InventoryException {
+		this.coffeeMaker.addInventory("1", "2", "4", "abc");
+		this.coffeeMaker.addInventory("1", "2", "4", "-1");
+		this.coffeeMaker.addInventory("1", "2", "4", "0");
+	}
+
+	/**
+	 * Given there are 15 items per each ingredient in inventory
+	 * When we try to check inventory and update items in inventory
+	 * then we should get the same value as checked.
+	 *
+	 * @throws InventoryException if there was an error parsing the quanity
+	 *  	to a positive integer.
+	 */
+	@Test
+	public void testCheckInventory() throws InventoryException {
+		Assert.assertEquals("Coffee: 15\nMilk: 15\nSugar: 15\nChocolate: 15\n", this.coffeeMaker.checkInventory());
+		this.coffeeMaker.addInventory("20", "20", "20", "20");
+		Assert.assertEquals("Coffee: 35\nMilk: 35\nSugar: 35\nChocolate: 35\n", this.coffeeMaker.checkInventory());
+	}
+
+	/**
+	 * Given a coffee maker with two valid recipes
+	 * When we make coffee, selecting the valid recipe and paying more than
 	 * 		the coffee costs
 	 * Then we get the correct change back.
 	 */
 	@Test
-	public void testMakeCoffee() {
-		coffeeMaker.addRecipe(recipe1);
-		assertEquals(25, coffeeMaker.makeCoffee(0, 75));
+	public void testMakeCoffeeWithValidInput() {
+		this.coffeeMaker.addRecipe(this.recipe1);
+		this.coffeeMaker.addRecipe(this.recipe3);
+		Assert.assertEquals(100L, (long)this.coffeeMaker.makeCoffee(0, 150));
+		Assert.assertEquals(0L, (long)this.coffeeMaker.makeCoffee(1, 100));
 	}
 
+	/**
+	 * Given a coffee maker with hasn't any recipes
+	 * When we try to make coffee with any recipes
+	 * Then we got change back.
+	 */
+	@Test
+	public void testMakeCoffeeWithNoRecipe() {
+		Assert.assertEquals(50L, (long)this.coffeeMaker.makeCoffee(1, 50));
+	}
+
+	/**
+	 * Given a coffee maker with has a valid recipe
+	 * When we try to make coffee with not enough ingredients in inventory
+	 * Then we got change back.
+	 */
+	@Test
+	public void testMakeCoffeeWithNotEnoughInventory() {
+		this.coffeeMaker.addRecipe(this.recipe2);
+		Assert.assertEquals(150L, (long)this.coffeeMaker.makeCoffee(0, 150));
+	}
+
+	/**
+	 * Given a coffee maker with has a valid recipe
+	 * When we try to make coffee with not enough money
+	 * Then we got change back.
+	 */
+	@Test
+	public void testMakeCoffeeWithNotEnoughMoney() {
+		this.coffeeMaker.addRecipe(this.recipe4);
+		Assert.assertEquals(0L, (long)this.coffeeMaker.makeCoffee(0, 0));
+	}
+
+	/**
+	 * Given a coffee maker with has a valid recipe
+	 * When we try to make coffee to update inventory
+	 * Then we should get update in inventory.
+	 */
+	@Test
+	public void testCheckInventoryAfterPurchase() {
+		this.coffeeMaker.addRecipe(this.recipe1);
+		this.coffeeMaker.makeCoffee(0, 100);
+		Assert.assertEquals("Coffee: 12\nMilk: 14\nSugar: 14\nChocolate: 15\n", this.coffeeMaker.checkInventory());
+	}
 }
