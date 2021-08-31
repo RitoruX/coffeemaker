@@ -92,20 +92,6 @@ public class CoffeeMakerTest {
 		recipe4.setAmtSugar("1");
 		recipe4.setPrice("65");
 	}
-	
-	
-	/**
-	 * Given a coffee maker with the default inventory
-	 * When we add inventory with well-formed quantities
-	 * Then we do not get an exception trying to read the inventory quantities.
-	 * 
-	 * @throws InventoryException  if there was an error parsing the quanity
-	 * 		to a positive integer.
-	 */
-	@Test
-	public void testAddInventory() throws InventoryException {
-		coffeeMaker.addInventory("4","7","0","9");
-	}
 
 	/**
 	 * Given two well-formed recipes
