@@ -184,8 +184,10 @@ public class CoffeeMakerTest {
 	 */
 	@Test
 	public void testAddInventoryWithValid() throws InventoryException {
-		this.coffeeMaker.addInventory("4", "7", "1", "9");
-		this.coffeeMaker.addInventory("2", "3", "4", "5");
+		this.coffeeMaker.addInventory("1", "0", "0", "0");
+		this.coffeeMaker.addInventory("0", "1", "0", "0");
+		this.coffeeMaker.addInventory("0", "0", "1", "0");
+		this.coffeeMaker.addInventory("0", "0", "0", "1");
 	}
 
 	/**
