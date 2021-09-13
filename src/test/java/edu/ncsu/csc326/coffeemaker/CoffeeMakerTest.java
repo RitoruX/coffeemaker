@@ -26,6 +26,9 @@ import org.junit.Test;
 
 import edu.ncsu.csc326.coffeemaker.exceptions.InventoryException;
 import edu.ncsu.csc326.coffeemaker.exceptions.RecipeException;
+import org.mockito.internal.matchers.Null;
+
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for CoffeeMaker class.
@@ -38,6 +41,12 @@ public class CoffeeMakerTest {
 	 * The object under test.
 	 */
 	private CoffeeMaker coffeeMaker;
+	private Inventory inventory;
+	private Recipe[] recipesList;
+
+	// Mock Objects for testing
+	private CoffeeMaker mockCoffeeMaker;
+	private RecipeBook mockRecipeBook;
 	
 	// Sample recipes to use in testing.
 	private Recipe recipe1;
@@ -55,6 +64,10 @@ public class CoffeeMakerTest {
 	@Before
 	public void setUp() throws RecipeException {
 		coffeeMaker = new CoffeeMaker();
+
+		mockRecipeBook = mock(RecipeBook.class);
+		inventory = new Inventory();
+		mockCoffeeMaker = new CoffeeMaker(mockRecipeBook, inventory);
 		
 		//Set up for r1
 		recipe1 = new Recipe();
@@ -91,6 +104,8 @@ public class CoffeeMakerTest {
 		recipe4.setAmtMilk("1");
 		recipe4.setAmtSugar("1");
 		recipe4.setPrice("65");
+
+		recipesList = new Recipe[]{recipe1, recipe2, recipe3, null};
 	}
 
 	/**
@@ -339,5 +354,56 @@ public class CoffeeMakerTest {
 		this.coffeeMaker.addRecipe(this.recipe1);
 		this.coffeeMaker.makeCoffee(0, 100);
 		Assert.assertEquals("Coffee: 12\nMilk: 14\nSugar: 14\nChocolate: 15\n", this.coffeeMaker.checkInventory());
+	}
+
+	/**
+	 * Assume that when mockRecipeBook call for recipes, it will return recipes list with 3 recipes.
+	 * When mockCoffeeMaker try to make coffee, it should return right change for coffee
+	 * And the Mockito verify that mockRecipeBook invokes function getRecipes for four times.
+	 */
+	@Test
+	public void mockTestMakeCoffee() {
+		when(mockRecipeBook.getRecipes()).thenReturn(recipesList);
+		assertEquals(20, mockCoffeeMaker.makeCoffee(2, 120));
+		verify(mockRecipeBook, times(4)).getRecipes();
+	}
+
+	/**
+	 * Assume that when mockRecipeBook call for recipes, it will return recipes list with 3 recipes.
+	 * When mockCoffeeMaker try to make coffee that not be exits in recipesBook
+	 * Then it shouldn't make any coffee and return paid changes
+	 * And the Mockito verify that mockRecipeBook invokes function getRecipes just 2 times.
+	 */
+	@Test
+	public void mockTestMakeCoffeeWithNoRecipe() {
+		when(mockRecipeBook.getRecipes()).thenReturn(recipesList);
+		assertEquals(100, mockCoffeeMaker.makeCoffee(3, 100));
+		verify(mockRecipeBook, times(1)).getRecipes();
+	}
+
+	/**
+	 * Assume that when mockRecipeBook call for recipes, it will return recipes list with 3 recipes.
+	 * When mockCoffeeMaker try to make coffee while paid changes less than coffee cost
+	 * Then it shouldn't make any coffee and return paid changes
+	 * And the Mockito verify that mockRecipeBook invokes function getRecipes just 2 times.
+	 */
+	@Test
+	public void mockTestMakeCoffeeWithNotEnoughMoney() {
+		when(mockRecipeBook.getRecipes()).thenReturn(recipesList);
+		assertEquals(20, mockCoffeeMaker.makeCoffee(2, 20));
+		verify(mockRecipeBook, times(2)).getRecipes();
+	}
+
+	/**
+	 * Assume that when mockRecipeBook call for recipes, it will return recipes list with 3 recipes.
+	 * When mockCoffeeMaker try to make coffee that hasn't enough ingredients in inventory
+	 * Then it shouldn't make any coffee and return paid changes
+	 * And the Mockito verify that mockRecipeBook invokes function getRecipes just 2 times.
+	 */
+	@Test
+	public void mockTestMakeCoffeeWithNotEnoughIngredients() {
+		when(mockRecipeBook.getRecipes()).thenReturn(recipesList);
+		assertEquals(20, mockCoffeeMaker.makeCoffee(1, 20));
+		verify(mockRecipeBook, times(2)).getRecipes();
 	}
 }
